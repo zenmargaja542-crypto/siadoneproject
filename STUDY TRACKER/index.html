@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Tracker | Focus. Track. Achieve.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-screen">
+  <div id="authRoot" class="auth-root" aria-live="polite"></div>
+
+  <div class="app-shell" id="appShell">
+    <nav class="sidebar" aria-label="Main navigation">
+      <div class="sidebar-brand" title="Study Tracker">
+        <span class="brand-icon">🎓</span>
+        <span class="brand-text">StudyTrack</span>
+      </div>
+
+      <div class="sidebar-nav">
+        <button class="nav-btn active" data-view="dashboard" title="Dashboard">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">Dashboard</span>
+        </button>
+        <button class="nav-btn" data-view="subjects" title="Subjects">
+          <span class="nav-icon">📚</span>
+          <span class="nav-label">Subjects</span>
+        </button>
+        <button class="nav-btn" data-view="timer" title="Timer">
+          <span class="nav-icon">⏱️</span>
+          <span class="nav-label">Timer</span>
+        </button>
+        <button class="nav-btn" data-view="calendar" title="Calendar">
+          <span class="nav-icon">📅</span>
+          <span class="nav-label">Calendar</span>
+        </button>
+        <button class="nav-btn" data-view="resources" title="Resources">
+          <span class="nav-icon">📁</span>
+          <span class="nav-label">Resources</span>
+        </button>
+        <button class="nav-btn" data-view="notes" title="Notes">
+          <span class="nav-icon">📝</span>
+          <span class="nav-label">Notes</span>
+        </button>
+        <button class="nav-btn" data-view="stats" title="Stats">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">Stats</span>
+        </button>
+        <button class="nav-btn" data-view="goals" title="Goals">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-label">Goals</span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div id="authBar" class="auth-bar"></div>
+        <button id="themeToggle" class="nav-btn theme-toggle" title="Toggle theme">
+          <span class="nav-icon" id="themeIcon">🌙</span>
+          <span class="nav-label" id="themeLabel">Dark</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="main-area" id="appMain">
+      <header class="topbar">
+        <div class="card greeting-card">
+          <div class="greeting-content">
+            <p class="greeting-eyebrow" id="greetingEyebrow">Good day,</p>
+            <h1 class="greeting-name" id="greetingName">Student</h1>
+            <p class="greeting-sub">Stay focused and turn your goals into achievements.</p>
+          </div>
+          <div class="greeting-wave" aria-hidden="true"></div>
+        </div>
+        <div class="card clock-card">
+          <p class="clock-date" id="clockDate">--</p>
+          <p class="clock-time" id="clockTime">--:--</p>
+          <p class="clock-period" id="clockPeriod">--</p>
+        </div>
+      </header>
+
+      <main id="app" class="app-main"></main>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Tracker — Real Sign-In Setup Wizard</title>
+<style>
+  :root { --bg:#0f172a; --bg2:#1e293b; --card:rgba(30,41,59,.7); --hover:#273449;
+    --accent:#6366f1; --accent2:#8b5cf6; --text:#e2e8f0; --muted:#94a3b8;
+    --ok:#22c55e; --danger:#ef4444; --border:rgba(148,163,184,.18); }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:24px 16px 60px; font-family:"Segoe UI",system-ui,sans-serif; color:var(--text);
+    line-height:1.55; background:radial-gradient(900px 500px at 15% -10%, rgba(99,102,241,.22), transparent 60%),
+    radial-gradient(700px 450px at 110% 110%, rgba(139,92,246,.16), transparent 55%), var(--bg); }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  header { display:flex; gap:16px; align-items:center; margin-bottom:18px; }
+  .logo { display:inline-flex; align-items:center; justify-content:center; width:60px; height:60px; font-size:30px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:18px; flex-shrink:0;
+    box-shadow:0 4px 18px rgba(99,102,241,.4); }
+  h1 { margin:0; font-size:1.35rem; letter-spacing:-.02em; }
+  header p { margin:4px 0 0; font-size:.88rem; color:var(--muted); }
+  .progress { height:8px; background:var(--hover); border-radius:6px; overflow:hidden; margin-bottom:22px; }
+  .progress > div { height:100%; width:0; background:linear-gradient(90deg,var(--accent),var(--accent2));
+    border-radius:6px; transition:width .4s ease; }
+  .step { background:var(--card); backdrop-filter:blur(14px); border:1px solid var(--border);
+    border-radius:16px; margin-bottom:16px; overflow:hidden; }
+  .step.done { border-color:rgba(34,197,94,.45); }
+  .step-head { display:flex; align-items:center; gap:12px; padding:14px 18px; cursor:pointer; }
+  .step-head .num { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px;
+    border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); font-weight:800;
+    font-size:.9rem; flex-shrink:0; }
+  .step.done .step-head .num { background:var(--ok); }
+  .step-head h2 { margin:0; font-size:.98rem; flex:1; }
+  .step-head input[type="checkbox"] { width:20px; height:20px; accent-color:var(--ok); cursor:pointer; flex-shrink:0; }
+  .step-body { display:none; padding:4px 18px 18px 60px; font-size:.9rem; color:var(--muted); }
+  .step.open .step-body { display:block; }
+  .step-body ol { margin:0 0 14px; padding-left:20px; }
+  .step-body li { margin-bottom:9px; }
+  .step-body b { color: var(--text); }
+  a { color:#a5b4fc; font-weight:600; text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:9px 16px; margin:3px 8px 3px 0;
+    font-size:.85rem; font-weight:700; color:#fff; background:linear-gradient(135deg,var(--accent),var(--accent2));
+    border:none; border-radius:10px; cursor:pointer; box-shadow:0 0 14px rgba(99,102,241,.25);
+    transition:transform .15s ease, filter .15s ease; }
+  .btn:hover { transform:translateY(-1px); filter:brightness(1.1); }
+  .btn.ghost { background:var(--hover); box-shadow:none; }
+  .warnbox { display:flex; gap:10px; padding:13px 15px; margin-bottom:18px; font-size:.85rem;
+    background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.4); border-radius:12px; }
+  .okbox { padding:12px 14px; margin:12px 0; font-size:.87rem; color:#bbf7d0;
+    background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.4); border-radius:12px; }
+  textarea { width:100%; min-height:150px; resize:vertical; padding:12px; color:var(--text);
+    font-family:Consolas,"Courier New",monospace; font-size:.78rem; line-height:1.5; background:var(--bg);
+    border:1px solid var(--border); border-radius:12px; outline:none; }
+  textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(99,102,241,.25); }
+  .url-row { display:flex; gap:8px; align-items:center; margin:8px 0; flex-wrap:wrap; }
+  .url-row code { flex:1; min-width:220px; padding:9px 12px; font-size:.78rem; color:var(--text);
+    background:var(--bg); border:1px solid var(--border); border-radius:9px; font-family:Consolas,monospace; word-break:break-all; }
+  .copy { padding:8px 13px; font-size:.78rem; font-weight:700; color:var(--text); background:var(--hover);
+    border:1px solid var(--border); border-radius:9px; cursor:pointer; }
+  .copy:hover { border-color:var(--accent); color:#fff; }
+  .copy.ok { border-color:var(--ok); color:var(--ok); }
+  .muted { color:var(--muted); font-size:.8rem; }
+  .status { min-height:20px; margin-top:10px; font-size:.85rem; }
+  .status.err { color:var(--danger); } .status.good { color:var(--ok); }
+  code.inline { padding:1px 6px; background:var(--hover); border-radius:6px; font-family:Consolas,monospace; font-size:.8rem; color:var(--text); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">🎓</div>
+    <div>
+      <h1>Real sign-in setup wizard</h1>
+      <p>Real Google · Facebook · GitHub login in ~10 minutes. The account clicks need <b>your</b> passwords — this wizard makes every step obvious and copies the tricky URLs for you.</p>
+    </div>
+  </header>
+
+  <div class="warnbox" id="protoWarn" hidden>
+    <span>⚠️</span>
+    <span>You opened this page as a <b>local file</b> (file://). Sign-in windows <b>cannot</b> work this way.
+    After setup, double-click <b>start-server.bat</b> in this folder and open
+    <code class="inline">http://localhost:8000</code> (or use the VS Code <b>Live Server</b> extension).</span>
+  </div>
+
+  <div class="progress"><div id="progFill"></div></div>
+
+  <section class="step" data-step="1">
+    <div class="step-head"><span class="num">1</span><h2>Create a free Firebase project & register the web app</h2><input type="checkbox" class="done" aria-label="Step 1 done"></div>
+    <div class="step-body">
+      <ol>
+        <li><b>Add project</b> → name it (e.g. <code class="inline">study-tracker</code>) → Continue → Create.</li>
+        <li>On the project page click the <b>Web icon &lt;/&gt;</b> → nickname <code class="inline">study-tracker</code> → <b>Register app</b> (skip Hosting).</li>
+        <li>Firebase shows a <code class="inline">firebaseConfig</code> block — you'll paste it in <b>Step 3</b>.</li>
+      </ol>
+      <a class="btn" href="https://console.firebase.google.com" target="_blank" rel="noopener">🌐 Open console.firebase.google.com</a>
+    </div>
+  </section>
+
+  <section class="step" data-step="2">
+    <div class="step-head"><span class="num">2</span><h2>Enable Google, Facebook & GitHub sign-in</h2><input type="checkbox" class="done" aria-label="Step 2 done"></div>
+    <div class="step-body">
+      <ol>
+        <li>Open <b>Authentication → Get started</b> (button below). Set a support email if asked.</li>
+        <li><b>Email/Password</b> → enable it (usually already on) — this powers the <b>Create account</b> and <b>Sign in</b> forms on the app. ✅</li>
+        <li><b>Google</b> → Enable → choose your email → Save. ✅ Nothing else needed.</li>
+        <li><b>Facebook</b>: create an app at Facebook for developers (type <b>Consumer</b>, add the <b>Facebook Login</b> product) → <b>Settings → Basic</b> → copy the <b>App ID</b> + <b>App Secret</b> → paste them into Firebase's Facebook provider → Save. Then put your callback URL (generated in Step 3) into <b>Facebook Login → Settings → Valid OAuth Redirect URIs</b>.</li>
+        <li><b>GitHub</b>: create an OAuth App on GitHub → paste the callback URL (from Step 3) → register → copy the <b>Client ID</b> + <b>Client Secret</b> into Firebase's GitHub provider → Save.</li>
+        <li><b>Authentication → Settings → Authorized domains</b>: add <code class="inline">localhost</code> (usually already there) and your live domain later (e.g. <code class="inline">yourname.github.io</code>).</li>
+      </ol>
+      <a class="btn" href="https://console.firebase.google.com/project/_/authentication/providers" target="_blank" rel="noopener">🔐 Firebase Authentication</a>
+      <a class="btn ghost" href="https://developers.facebook.com/apps" target="_blank" rel="noopener">📘 Facebook for developers</a>
+      <a class="btn ghost" href="https://github.com/settings/developers" target="_blank" rel="noopener">🐙 GitHub OAuth Apps</a>
+    </div>
+  </section>
+  <section class="step" data-step="3">
+    <div class="step-head"><span class="num">3</span><h2>Paste your firebaseConfig — get your exact callback URLs</h2><input type="checkbox" class="done" aria-label="Step 3 done"></div>
+    <div class="step-body">
+      <ol>
+        <li>In Firebase open <b>⚙️ Project settings → Your apps</b> (button below) → copy the whole <code class="inline">firebaseConfig</code> block.</li>
+        <li>Paste it below and press <b>Check my config</b> — the wizard builds the exact URLs Facebook/GitHub need.</li>
+      </ol>
+      <textarea id="cfg" spellcheck="false" placeholder='Paste the whole firebaseConfig here, e.g.&#10;{&#10;  "apiKey": "AIzaSy...",&#10;  "authDomain": "your-project.firebaseapp.com",&#10;  "projectId": "your-project",&#10;  "storageBucket": "your-project.appspot.com",&#10;  "messagingSenderId": "1234567890",&#10;  "appId": "1:1234567890:web:abc123"&#10;}'></textarea>
+      <div style="margin-top:10px;">
+        <button class="btn" id="checkCfg">✓ Check my config</button>
+        <a class="btn ghost" href="https://console.firebase.google.com/project/_/settings/general" target="_blank" rel="noopener">⚙️ Project settings</a>
+      </div>
+      <div id="cfgResult" hidden></div>
+    </div>
+  </section>
+
+  <section class="step" data-step="4">
+    <div class="step-head"><span class="num">4</span><h2>Activate — save the config & try real sign-in</h2><input type="checkbox" class="done" aria-label="Step 4 done"></div>
+    <div class="step-body">
+      <p>Click the button: it saves your config into this browser and switches the app to real sign-in (when the app is opened the same way as this page).</p>
+      <button class="btn" id="saveCfg">💾 Save config &amp; activate real sign-in</button>
+      <p class="status" id="saveStatus"></p>
+      <ol>
+        <li>Open <a href="index.html" target="_blank" rel="noopener">index.html →</a> the same way you opened this page (Live Server / same server).</li>
+        <li>Click <b>Continue with Google / Facebook / GitHub</b> → the <b>real</b> provider window opens → approve → you're signed in with your real name, email &amp; avatar 🔒</li>
+        <li>If a red toast appears, read it — it names the exact fix (usually adding this domain under <b>Authentication → Settings → Authorized domains</b>).</li>
+      </ol>
+      <p class="muted">Remove anytime: app login screen → ⚙️ Enable real sign-in → "Remove saved config".</p>
+    </div>
+  </section>
+
+  <p class="muted" style="text-align:center;margin-top:22px;">
+    Full written guide: <a href="AUTH-SETUP.md" target="_blank" rel="noopener">AUTH-SETUP.md</a> · <a href="index.html" target="_blank" rel="noopener">open the app</a>
+  </p>
+</div>
+<script>
+(function () {
+  "use strict";
+  const $ = s => document.querySelector(s);
+
+  /* --- protocol warning (file:// can't open sign-in windows) --- */
+  if (location.protocol === "file:") $("#protoWarn").hidden = false;
+
+  /* --- collapsible steps + persisted progress --- */
+  const saved = JSON.parse(localStorage.getItem("st_wizard_progress") || "{}");
+  const steps = Array.prototype.slice.call(document.querySelectorAll(".step"));
+  function refresh() {
+    const done = steps.filter(s => s.classList.contains("done")).length;
+    $("#progFill").style.width = (done / steps.length * 100) + "%";
+  }
+  steps.forEach((s, i) => {
+    const cb = s.querySelector('input[type="checkbox"]');
+    if (saved[i + 1]) { s.classList.add("done"); cb.checked = true; }
+    if (i === 0) s.classList.add("open");
+    s.querySelector(".step-head").addEventListener("click", e => {
+      if (e.target === cb) return;
+      s.classList.toggle("open");
+    });
+    cb.addEventListener("change", () => {
+      s.classList.toggle("done", cb.checked);
+      saved[i + 1] = cb.checked;
+      localStorage.setItem("st_wizard_progress", JSON.stringify(saved));
+      refresh();
+    });
+  });
+  refresh();
+
+  /* --- config parsing (same rules as the app's ⚙️ panel) --- */
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function parseConfig(raw) {
+    const text = (raw || "").trim();
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    if (!text || start === -1 || end <= start) {
+      return { ok: false, error: "No { … } block found — paste the whole firebaseConfig block." };
+    }
+    try {
+      const cfg = JSON.parse(text.slice(start, end + 1));
+      const missing = ["apiKey", "authDomain", "projectId", "appId"].filter(k => !cfg[k]);
+      if (missing.length) return { ok: false, error: "That config is missing: " + missing.join(", ") };
+      return { ok: true, cfg };
+    } catch (e) {
+      return { ok: false, error: "Not valid JSON — copy the block exactly from Firebase." };
+    }
+  }
+  function handlerUrl(authDomain) {
+    return "https://" + String(authDomain).replace(/^https?:\/\//, "") + "/__/auth/handler";
+  }
+  function copyText(text, btn) {
+    const done = () => {
+      if (!btn) return;
+      const old = btn.textContent;
+      btn.textContent = "✅ Copied"; btn.classList.add("ok");
+      setTimeout(() => { btn.textContent = old; btn.classList.remove("ok"); }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+    } else fallbackCopy(text, done);
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (e) { /* noop */ }
+    ta.remove(); done();
+  }
+
+  /* --- Step 3: check config → generate the provider callback URL --- */
+  $("#checkCfg").addEventListener("click", () => {
+    const res = parseConfig($("#cfg").value);
+    const box = $("#cfgResult");
+    box.hidden = false;
+    if (!res.ok) {
+      box.className = "warnbox";
+      box.innerHTML = "<span>❌</span><span><b>" + escapeHtml(res.error) + "</b></span>";
+      return;
+    }
+    const url = handlerUrl(res.cfg.authDomain);
+    box.className = "okbox";
+    box.innerHTML =
+      "<b>✅ Config looks good (project: " + escapeHtml(res.cfg.projectId) + ")!</b><br><br>" +
+      "Paste this exact URL into the developer consoles from Step 2:" +
+      '<div class="url-row"><code id="cbUrl">' + escapeHtml(url) + '</code>' +
+      '<button class="copy" id="copyBtn" type="button">📋 Copy</button></div>' +
+      '<span class="muted">→ GitHub: "Authorization callback URL" · Facebook: "Valid OAuth Redirect URIs" · and add your hosting domain under Firebase → Authentication → Settings → Authorized domains</span>';
+    $("#copyBtn").addEventListener("click", e => copyText($("#cbUrl").textContent, e.target));
+  });
+
+  /* --- Step 4: activate --- */
+  $("#saveCfg").addEventListener("click", () => {
+    const res = parseConfig($("#cfg").value);
+    const st = $("#saveStatus");
+    if (!res.ok) {
+      st.textContent = "❌ " + res.error;
+      st.className = "status err";
+      return;
+    }
+    localStorage.setItem("st_firebase_config", JSON.stringify(res.cfg));
+    st.textContent = "✅ Saved! Open index.html the same way you opened this page and click a provider — real sign-in is ON. (Remove it anytime from the app's ⚙️ panel.)";
+    st.className = "status good";
+  });
+
+  /* --- automated self-test: open with ?selftest=1 --- */
+  if (location.search.indexOf("selftest=1") !== -1) {
+    const out = [];
+    const t = (n, ok, d) => out.push((ok ? "PASS" : "FAIL") + ": " + n + (d ? " | " + d : ""));
+    const r1 = parseConfig('window.FIREBASE_CONFIG = {\n "apiKey": "AIza", "authDomain": "p.firebaseapp.com", "projectId": "p", "storageBucket": "s", "messagingSenderId": "1", "appId": "a" \n};');
+    t("parse wrapped JSON", r1.ok && r1.cfg.apiKey === "AIza", JSON.stringify(r1));
+    t("reject broken JSON", !parseConfig("{oops").ok);
+    t("reject missing keys", !parseConfig('{"apiKey":"a"}').ok);
+    t("reject garbage", !parseConfig("hello world").ok);
+    t("handler url from authDomain", handlerUrl("p.firebaseapp.com") === "https://p.firebaseapp.com/__/auth/handler");
+    t("escapeHtml works", escapeHtml('<a href="x">') === "&lt;a href=&quot;x&quot;&gt;");
+    const cb = steps[0].querySelector('input[type="checkbox"]');
+    cb.checked = true; cb.dispatchEvent(new Event("change"));
+    t("progress persisted", JSON.parse(localStorage.getItem("st_wizard_progress"))["1"] === true);
+    cb.checked = false; cb.dispatchEvent(new Event("change"));
+    document.body.dataset.testResult = out.join(" || ");
+  }
+})();
+</script>
+</body>
+</html>
+
